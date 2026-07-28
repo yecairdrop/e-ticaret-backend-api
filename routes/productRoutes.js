@@ -4,16 +4,20 @@ const router = express.Router();
 // Controller'dan 4 fonksiyonu da içeri alıyoruz
 const { createProduct, getProducts, updateProduct, deleteProduct } = require('../controllers/productController');
 
-// Ürünleri Listeleme (GET)
+// Güvenlik kapılarımızı içeri alıyoruz (Az önce oluşturduğumuz iki dosya)
+const verifyToken = require('../middleware/authMiddleware'); 
+const verifyAdmin = require('../middleware/adminMiddleware');
+
+// Ürünleri Listeleme (GET) - Herkese açık, koruma yok
 router.get('/', getProducts);
 
-// Yeni Ürün Ekleme (POST)
-router.post('/', createProduct);
+// Yeni Ürün Ekleme (POST) - Önce giriş yapmış mı (verifyToken), sonra admin mi (verifyAdmin) kontrol et
+router.post('/', verifyToken, verifyAdmin, createProduct);
 
-// Ürün Güncelleme (PUT) - Dikkat: Hangi ürün olduğunu ID ile belirtiyoruz (örnek: /api/products/1)
-router.put('/:id', updateProduct);
+// Ürün Güncelleme (PUT) - Önce giriş, sonra admin kontrolü
+router.put('/:id', verifyToken, verifyAdmin, updateProduct);
 
-// Ürün Silme (DELETE) - Hangi ürün silinecekse ID'sini veriyoruz
-router.delete('/:id', deleteProduct);
+// Ürün Silme (DELETE) - Önce giriş, sonra admin kontrolü
+router.delete('/:id', verifyToken, verifyAdmin, deleteProduct);
 
 module.exports = router;
