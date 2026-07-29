@@ -1,26 +1,47 @@
 const pool = require('../config/db');
 
-// 1. Ürün Ekleme (Create)
+// 1. Ürün Ekleme (Create) - GÜNCELLENDİ
 const createProduct = async (req, res) => {
     try {
-        const { title, description, price, stock, image_url, category } = req.body;
+        const { title, description, price, stock, category } = req.body;
+        
+        // Cloudinary resmi yükledi ve linki bize 'req.file.path' içinde gönderdi. Onu alıyoruz.
+        const image_url = req.file ? req.file.path : null;
+
         const newProduct = await pool.query(
             'INSERT INTO products (title, description, price, stock, image_url, category) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
             [title, description, price, stock, image_url, category]
         );
         res.status(201).json({ mesaj: "Urun basariyla eklendi!", urun: newProduct.rows[0] });
     } catch (error) {
+        console.error(error); // Eğer bir hata çıkarsa terminalde sebebini detaylıca görelim
         res.status(500).json({ mesaj: "Sunucu hatasi!" });
     }
 };
 
+// ... (Alt taraftaki getProducts, updateProduct ve deleteProduct kodlarına dokunma, onlar aynı kalsın) ...
+
 // 2. Ürünleri Listeleme (Read)
+// 2. Ürünleri Getirme (Filtreleme Özellikli)
 const getProducts = async (req, res) => {
     try {
-        const allProducts = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
-        res.status(200).json({ mesaj: "Urunler getirildi!", urunler: allProducts.rows });
+        // URL'nin sonuna eklenen '?category=Spor Giyim' gibi bir filtre var mı diye bakıyoruz
+        const { category } = req.query; 
+        
+        let allProducts;
+
+        if (category) {
+            // Eğer kategori belirtilmişse, SADECE o kategoriye ait olanları getir
+            allProducts = await pool.query('SELECT * FROM products WHERE category = $1', [category]);
+        } else {
+            // Kategori belirtilmemişse, depodaki BÜTÜN ürünleri getir
+            allProducts = await pool.query('SELECT * FROM products');
+        }
+
+        res.status(200).json(allProducts.rows);
     } catch (error) {
-        res.status(500).json({ mesaj: "Sunucu hatasi!" });
+        console.error(error.message);
+        res.status(500).json({ mesaj: "Sunucu hatasi, urunler getirilemedi!" });
     }
 };
 
