@@ -1,10 +1,1 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background-color: #fafafa; /* Premium tasarımımızın ana arka plan rengi */
-  overflow-x: hidden; /* Yanlışlıkla yana kaymayı engeller */
-}
+@import "tailwindcss";
