@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useCart } from '../context/CartContext'; // 1. Sepet beynini import ettik
 
 const ProductDetail = () => {
-  const { id } = useParams(); // URL'den ürünün ID'sini alıyoruz
+  const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // 2. Context'ten sepete ekleme fonksiyonunu çektik
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await api.get(`/products/${id}`);
-        // Backend'den dönen verinin yapısına göre eseri yakalıyoruz
         setProduct(response.data.urun || response.data);
         setLoading(false);
       } catch (err) {
@@ -52,7 +55,6 @@ const ProductDetail = () => {
     <div className="min-h-[calc(100vh-81px)] bg-[#fafafa] font-sans pb-24">
       <div className="max-w-7xl mx-auto px-8 md:px-20 pt-12 md:pt-16">
         
-        {/* Zarif Bir Geri Dön Butonu */}
         <button 
           onClick={() => navigate('/products')}
           className="group flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-neutral-500 hover:text-[#111] transition-colors mb-12"
@@ -63,10 +65,8 @@ const ProductDetail = () => {
           Koleksiyona Dön
         </button>
 
-        {/* Eserin Kendisi ve Detayları (İkiye Bölünmüş Ekran) */}
         <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
           
-          {/* Sol Taraf: Dev Görsel Alanı */}
           <div className="w-full lg:w-1/2 flex-shrink-0">
             <div className="aspect-[4/5] bg-neutral-100 rounded-sm overflow-hidden">
               <img 
@@ -77,7 +77,6 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Sağ Taraf: Tipografi ve Bilgi */}
           <div className="w-full lg:w-1/2 flex flex-col justify-center">
             
             <span className="text-xs tracking-[0.2em] text-neutral-400 uppercase font-medium mb-4 block">
@@ -92,7 +91,6 @@ const ProductDetail = () => {
               {product.price ? `${product.price} ₺` : "Fiyat Belirlenmedi"}
             </p>
             
-            {/* Lüks Markaların Kullandığı İnce Ayraç */}
             <div className="w-12 h-[1px] bg-neutral-300 mb-10"></div>
             
             <div className="mb-14">
@@ -104,8 +102,11 @@ const ProductDetail = () => {
               </p>
             </div>
             
-            {/* Sepete Ekle Butonu - Simsiyah ve Net */}
-            <button className="w-full bg-[#111] text-white py-5 px-8 text-xs tracking-[0.2em] uppercase font-medium hover:bg-neutral-800 transition-colors duration-300">
+            {/* 3. Butona onClick özelliğini verdik ve fonksiyonu bağladık */}
+            <button 
+              onClick={() => addToCart(product)}
+              className="w-full bg-[#111] text-white py-5 px-8 text-xs tracking-[0.2em] uppercase font-medium hover:bg-neutral-800 transition-colors duration-300"
+            >
               Sepete Ekle
             </button>
             

@@ -5,6 +5,7 @@ import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import Login from './pages/Login';
 import Admin from './pages/Admin'; // Admin sayfasını içeri alıyoruz
+import Checkout from './pages/Checkout';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} /> {/* Rota eklendi! */}
+          <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </div>
     </Router>
